@@ -17,6 +17,7 @@
             --text-light: #7a7a7a;
             --white: #ffffff;
             --blush: #f5e6e0;
+            --vk-color: #0077FF;
             --safe-bottom: env(safe-area-inset-bottom, 16px);
         }
 
@@ -141,11 +142,31 @@
         .color-swatch { width: 45px; height: 45px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 2px solid var(--white); }
         .dresscode-note { font-size: 0.8rem; color: var(--text-light); margin-top: 1.2rem; max-width: 300px; margin-left: auto; margin-right: auto; line-height: 1.6; }
 
-        /* ===== INFO ===== */
+        /* ===== LOTTERY INFO ===== */
         .info-section { padding: 3rem 1.2rem; background: var(--white); text-align: center; }
 
+        /* ===== CONTACTS ===== */
+        .contacts-section { padding: 3rem 1.2rem; background: linear-gradient(180deg, var(--cream), var(--white)); text-align: center; }
+        .contacts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 400px; margin: 0 auto 2rem; }
+        .contact-card { background: var(--white); border-radius: 12px; padding: 1.5rem 1rem; box-shadow: 0 2px 12px rgba(0,0,0,0.03); border: 1px solid rgba(184, 134, 11, 0.1); display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+        .contact-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--dark); margin-bottom: 0.2rem; }
+        .contact-link { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 0.55rem 0.8rem; border-radius: 8px; text-decoration: none; font-size: 0.75rem; letter-spacing: 0.03rem; transition: all 0.2s; border: 1px solid transparent; }
+        
+        /* Phone Button Style */
+        .contact-link.phone { background: var(--cream); color: var(--text); border-color: #e0d5c5; }
+        .contact-link.phone:active { background: #e0d5c5; }
+
+        /* VK Button Style */
+        .contact-link.vk { background: var(--vk-color); color: white; font-weight: 500; border: none; }
+        .contact-link.vk:active { background: #0066cc; }
+
+        /* Chat Container */
+        .chat-container { max-width: 400px; margin: 0 auto; background: linear-gradient(135deg, var(--blush), var(--white)); padding: 1.5rem; border-radius: 16px; border: 1px solid rgba(184, 134, 11, 0.15); }
+        .chat-btn { display: block; width: 100%; margin-top: 0.8rem; padding: 0.8rem; background: linear-gradient(135deg, var(--vk-color), #4a90e2); color: white; border-radius: 10px; text-decoration: none; font-weight: 500; transition: transform 0.2s, filter 0.2s; font-size: 0.85rem; }
+        .chat-btn:active { transform: scale(0.98); filter: brightness(0.95); }
+
         /* ===== YANDEX FORM BUTTON ===== */
-        .yandex-form-section { padding: 3rem 1.2rem; background: linear-gradient(180deg, var(--cream), var(--white)); text-align: center; }
+        .yandex-form-section { padding: 3rem 1.2rem; background: var(--white); text-align: center; border-top: 1px solid rgba(0,0,0,0.03); }
         .form-btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
             padding: 1rem 2.2rem; font-family: 'Montserrat', sans-serif; font-size: 0.85rem;
@@ -191,6 +212,10 @@
             .timeline::before { left: 50%; transform: translateX(-50%); }
             .timeline-item { justify-content: space-between; text-align: center; }
             .timeline-dot { margin: 0 auto; }
+        }
+        
+        @media (max-width: 380px) {
+            .contacts-grid { grid-template-columns: 1fr; max-width: 250px; }
         }
     </style>
 </head>
@@ -299,13 +324,40 @@
         <p class="dresscode-note reveal">Подтвердите присутствие заранее.<br>Контакт: <strong>+7 (XXX) XXX-XX-XX</strong></p>
     </section>
 
+    <!-- CONTACTS (VK & Phones & Chat) -->
+    <section class="contacts-section" id="contacts">
+        <h2 class="section-title reveal">Связь с нами</h2>
+        <p class="section-subtitle reveal">мы всегда на связи</p>
+        <div class="contacts-grid reveal">
+            <div class="contact-card">
+                <h3>Даниил</h3>
+                <!-- Замените номера и ссылки ниже -->
+                <a href="tel:+79215483463" class="contact-link phone">📞 Позвонить</a>
+                <a href="https://vk.ru/i__danya_t" target="_blank" class="contact-link vk">🔵 ВКонтакте</a>
+            </div>
+            <div class="contact-card">
+                <h3>Диана</h3>
+                <!-- Замените номера и ссылки ниже -->
+                <a href="tel:+79315055350" class="contact-link phone">📞 Позвонить</a>
+                <a href="http://vk.ru/foreveryoung030824" target="_blank" class="contact-link vk">🔵 ВКонтакте</a>
+            </div>
+        </div>
+        
+        <div class="chat-container reveal">
+            <p style="margin-bottom:0.5rem; font-size:0.9rem; color:var(--text);">💬 Чат гостей ВКонтакте</p>
+            <p style="font-size:0.75rem; color:var(--text-light);">Все новости, фото и обсуждения здесь</p>
+            <!-- Замените ссылку ниже на вашу ссылку приглашения в чат -->
+            <a href="https://vk.me/join/B/msUepMlmdgpiEC3gAP/Mf1p_amIMdciQo=" target="_blank" class="chat-btn">Вступить в чат</a>
+        </div>
+    </section>
+
     <!-- YANDEX FORM BUTTON -->
     <section class="yandex-form-section" id="rsvp">
-        <h2 class="section-title reveal">Музыкальные предпочтения</h2>
+        <h2 class="section-title reveal">Подтвердите присутствие</h2>
         <p class="section-subtitle reveal">заполните, пожалуйста, форму</p>
         <div class="reveal" style="margin-top: 1.5rem;">
-            <!-- 🔽 ВСТАВЬТЕ ВАШУ ССЫЛКУ НИЖЕ вместо # 🔽 -->
-            <a href="https://forms.yandex.ru/u/6a1b150490fa7bd0d883543c" 
+            <!-- Вставьте вашу ссылку на форму вместо # -->
+            <a href="https://forms.yandex.ru/u/ВАШ_ID_ФОРМЫ/" 
                target="_blank" rel="noopener noreferrer" 
                class="form-btn">
                 📝 Заполнить форму
