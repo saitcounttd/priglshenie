@@ -1,7 +1,10 @@
 <?php
+
 declare(strict_types=1);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['music_form'])) {
     header('Content-Type: application/json; charset=utf-8');
+
     $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
     $data = [];
 
@@ -14,6 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['music_form'])) {
     }
 
     $songRequest = trim((string)($data['songRequest'] ?? ''));
+    $songRequest = preg_replace('/\s+/u', ' ', $songRequest) ?? $songRequest;
+    $songRequest = strip_tags($songRequest);
+
     if ($songRequest === '') {
         http_response_code(422);
         echo json_encode([
@@ -22,75 +28,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['music_form'])) {
         ], JSON_UNESCAPED_UNICODE);
         exit;
     }
-    $surveyId = '6a1ad41c4936393a29432800';
+
+    if (mb_strlen($songRequest, 'UTF-8') > 2000) {
+        http_response_code(422);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Пожелание слишком длинное. Сократите текст до 2000 символов.',
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
     /*
-     * ВАЖНО:
-     * Здесь нужен ID вопроса из Яндекс Формы.
-     * Это НЕ ID формы.
-     *
-     * Пример:
-     * $questionId = 'id-text';
-     * или:
-     * $questionId = 'answer_long_text_123456';
+     * Куда отправлять письма.
+     * ЗАМЕНИ адрес ниже на нужную почту.
      */
-    $questionId = 'answer_short_text_9008979397902830';
-    /*
-     * OAuth-токен.
-     *
-     * Если форма разрешает анонимное заполнение через API,
-     * можно оставить пустую строку.
-     *
-     * Если Яндекс вернет 401 или 403, сюда нужно будет вставить OAuth-токен.
-     */
-    $oauthToken = '';
-    $apiUrl = "https://api.forms.yandex.net/v1/surveys/{$surveyId}/form";
-    $payload = [
-        $questionId => $songRequest,
-    ];
+    $toEmail = 'danya.telminov@yandex.ru`';
+
+    if (!filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'На сайте не настроена почта получателя.',
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $host = preg_replace('/:\\d+$/', '', $host) ?: 'localhost';
+    $host = preg_replace('/^www\./i', '', $host) ?: $host;
+
+    $fromEmail = $host === 'localhost'
+        ? 'no-reply@example.com'
+        : 'no-reply@' . $host;
+
+    $subject = 'Музыкальное пожелание со свадебного сайта';
+    $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
+
+    $date = date('d.m.Y H:i:s');
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'не определён';
+
+    $message = "Новое музыкальное пожелание:\n\n"
+        . $songRequest
+        . "\n\n------------------------------\n"
+        . "Дата отправки: {$date}\n"
+        . "IP: {$ip}\n"
+        . "Сайт: {$host}\n";
+
     $headers = [
-        'Content-Type: application/json',
+        'MIME-Version: 1.0',
+        'Content-Type: text/plain; charset=UTF-8',
+        'From: Wedding Site <' . $fromEmail . '>',
+        'Reply-To: ' . $fromEmail,
+        'X-Mailer: PHP/' . phpversion(),
     ];
-    if ($oauthToken !== '') {
-        $headers[] = 'Authorization: OAuth ' . $oauthToken;
-    }
-    $ch = curl_init($apiUrl);
-    curl_setopt_array($ch, [
-        CURLOPT_POST => true,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => $headers,
-        CURLOPT_POSTFIELDS => json_encode($payload, JSON_UNESCAPED_UNICODE),
-        CURLOPT_TIMEOUT => 15,
-    ]);
-    $responseBody = curl_exec($ch);
-    $curlError = curl_error($ch);
-    $statusCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    if ($responseBody === false || $curlError !== '') {
+
+    $sent = mail(
+        $toEmail,
+        $encodedSubject,
+        $message,
+        implode("\r\n", $headers)
+    );
+
+    if (!$sent) {
         http_response_code(500);
         echo json_encode([
             'success' => false,
-            'message' => 'Ошибка соединения с Яндекс Формой.',
+            'message' => 'Сервер не смог отправить письмо. Проверьте поддержку PHP mail() на хостинге.',
         ], JSON_UNESCAPED_UNICODE);
         exit;
     }
-    $responseData = json_decode((string)$responseBody, true);
-    if ($statusCode < 200 || $statusCode >= 300) {
-        http_response_code(500);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Яндекс Форма не приняла ответ.',
-            'yandex_status' => $statusCode,
-            'yandex_response' => $responseData ?: $responseBody,
-        ], JSON_UNESCAPED_UNICODE);
-        exit;
-    }
+
     echo json_encode([
         'success' => true,
-        'message' => 'Пожелание успешно отправлено.',
-        'answer_id' => $responseData['answer_id'] ?? null,
+        'message' => 'Пожелание успешно отправлено на почту.',
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -517,7 +531,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 musicForm.reset();
-                showMessage('Спасибо! Ваше музыкальное пожелание отправлено 🎶', true);
+                showMessage('Спасибо! Ваше музыкальное пожелание отправлено на почту 🎶', true);
             } catch (error) {
                 console.error(error);
                 showMessage('Ошибка отправки. Попробуйте ещё раз.', false);
