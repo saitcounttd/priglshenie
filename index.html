@@ -1,24 +1,22 @@
 <?php
-
 declare(strict_types=1);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['music_form'])) {
     header('Content-Type: application/json; charset=utf-8');
 
-    $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
-    $data = [];
+    $rawInput = file_get_contents('php://input');
+    $data = json_decode($rawInput, true);
 
-    if (stripos($contentType, 'application/json') !== false) {
-        $rawInput = file_get_contents('php://input');
-        $decoded = json_decode((string)$rawInput, true);
-        $data = is_array($decoded) ? $decoded : [];
-    } else {
-        $data = $_POST;
+    if (!is_array($data)) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Некорректные данные формы.',
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 
     $songRequest = trim((string)($data['songRequest'] ?? ''));
-    $songRequest = preg_replace('/\s+/u', ' ', $songRequest) ?? $songRequest;
-    $songRequest = strip_tags($songRequest);
 
     if ($songRequest === '') {
         http_response_code(422);
@@ -29,7 +27,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['music_form'])) {
         exit;
     }
 
-    if (mb_strlen($songRequest, 'UTF-8') > 2000) {
+    $songLength = function_exists('mb_strlen')
+        ? mb_strlen($songRequest, 'UTF-8')
+        : strlen($songRequest);
+
+    if ($songLength > 2000) {
         http_response_code(422);
         echo json_encode([
             'success' => false,
@@ -39,10 +41,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['music_form'])) {
     }
 
     /*
-     * Куда отправлять письма.
-     * ЗАМЕНИ адрес ниже на нужную почту.
+     * Почта, куда будут приходить музыкальные пожелания.
      */
-    $toEmail = 'danya.telminov@yandex.ru`';
+    $toEmail = 'danya.teminov@yandex.ru';
 
     if (!filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
         http_response_code(500);
@@ -54,12 +55,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['music_form'])) {
     }
 
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $host = preg_replace('/:\\d+$/', '', $host) ?: 'localhost';
-    $host = preg_replace('/^www\./i', '', $host) ?: $host;
+    $host = strtolower((string)$host);
+    $host = preg_replace('/:\d+$/', '', $host);
+    $host = preg_replace('/^www\./', '', $host);
+    $host = preg_replace('/[^a-z0-9.-]/', '', $host);
 
-    $fromEmail = $host === 'localhost'
-        ? 'no-reply@example.com'
-        : 'no-reply@' . $host;
+    $fromDomain = $host !== '' ? $host : 'example.com';
+    $fromEmail = 'noreply@' . $fromDomain;
+
+    if (!filter_var($fromEmail, FILTER_VALIDATE_EMAIL)) {
+        $fromEmail = 'noreply@example.com';
+    }
 
     $subject = 'Музыкальное пожелание со свадебного сайта';
     $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
@@ -67,12 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['music_form'])) {
     $date = date('d.m.Y H:i:s');
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'не определён';
 
-    $message = "Новое музыкальное пожелание:\n\n"
-        . $songRequest
-        . "\n\n------------------------------\n"
-        . "Дата отправки: {$date}\n"
-        . "IP: {$ip}\n"
-        . "Сайт: {$host}\n";
+    $mailText = "Новое музыкальное пожелание:\n\n";
+    $mailText .= $songRequest . "\n\n";
+    $mailText .= "-------------------------\n";
+    $mailText .= "Дата отправки: {$date}\n";
+    $mailText .= "IP: {$ip}\n";
+    $mailText .= "Сайт: {$fromDomain}\n";
 
     $headers = [
         'MIME-Version: 1.0',
@@ -82,12 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['music_form'])) {
         'X-Mailer: PHP/' . phpversion(),
     ];
 
-    $sent = mail(
-        $toEmail,
-        $encodedSubject,
-        $message,
-        implode("\r\n", $headers)
-    );
+    $sent = mail($toEmail, $encodedSubject, $mailText, implode("\r\n", $headers));
 
     if (!$sent) {
         http_response_code(500);
@@ -104,8 +105,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['music_form'])) {
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -492,55 +493,42 @@ document.addEventListener('DOMContentLoaded', function () {
         const songRequest = document.getElementById('songRequest');
         const submitBtn = document.getElementById('musicSubmitBtn');
         const message = document.getElementById('musicFormMessage');
-
         if (!musicForm || !songRequest || !submitBtn || !message) {
             return;
         }
-
         musicForm.addEventListener('submit', async function (event) {
             event.preventDefault();
             event.stopImmediatePropagation();
-
             const songValue = songRequest.value.trim();
-
             if (!songValue) {
                 showMessage('Пожалуйста, напишите музыкальное пожелание.', false);
                 return;
             }
-
             submitBtn.disabled = true;
             submitBtn.textContent = 'Отправляем...';
-
             try {
                 const response = await fetch(`${window.location.pathname}?music_form=1`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         songRequest: songValue
                     })
                 });
-
                 const result = await response.json();
-
                 if (!response.ok || !result.success) {
-                    console.error(result);
                     throw new Error(result.message || 'Ошибка отправки.');
                 }
-
                 musicForm.reset();
-                showMessage('Спасибо! Ваше музыкальное пожелание отправлено на почту 🎶', true);
+                showMessage('Спасибо! Ваше музыкальное пожелание отправлено 🎶 ', true);
             } catch (error) {
-                console.error(error);
                 showMessage('Ошибка отправки. Попробуйте ещё раз.', false);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = '✨ Отправить пожелание';
             }
-        }, true);
-
+        });
         function showMessage(text, isSuccess) {
             message.textContent = text;
             message.style.display = 'block';
