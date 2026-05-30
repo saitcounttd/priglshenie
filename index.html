@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -61,30 +60,6 @@
             will-change: opacity, transform;
         }
         .reveal.visible { opacity: 1; transform: translateY(0); }
-
-        /* ===== FORM STYLES ===== */
-        .music-section { padding: 3rem 1.2rem; background: linear-gradient(180deg, var(--cream), var(--white)); text-align: center; }
-        .music-form { max-width: 400px; margin: 0 auto; text-align: left; }
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; font-size: 0.75rem; letter-spacing: 0.08rem; text-transform: uppercase; color: var(--text-light); margin-bottom: 0.4rem; }
-        .form-group textarea {
-            width: 100%; padding: 0.9rem 1rem; font-family: 'Montserrat', sans-serif; font-size: 0.95rem;
-            border: 1px solid #e0d5c5; border-radius: 10px; background: var(--white); color: var(--dark);
-            transition: border-color 0.2s, box-shadow 0.2s; outline: none; min-height: 110px; resize: vertical;
-        }
-        .form-group textarea:focus {
-            border-color: var(--gold-light); box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.12);
-        }
-        .form-hint { font-size: 0.7rem; color: var(--text-light); margin-top: 0.3rem; display: block; }
-
-        .submit-btn {
-            display: block; width: 100%; padding: 1rem; font-family: 'Montserrat', sans-serif; font-size: 0.8rem;
-            letter-spacing: 0.12rem; text-transform: uppercase; color: var(--white);
-            background: linear-gradient(135deg, var(--gold), var(--gold-light)); border: none; border-radius: 10px;
-            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, background 0.3s; min-height: 44px; margin-top: 0.5rem;
-        }
-        .submit-btn:active { transform: scale(0.98); }
-        .submit-btn:disabled { opacity: 0.8; cursor: wait; }
 
         /* ===== HERO ===== */
         .hero {
@@ -169,6 +144,22 @@
         /* ===== INFO ===== */
         .info-section { padding: 3rem 1.2rem; background: var(--white); text-align: center; }
 
+        /* ===== YANDEX FORM BUTTON ===== */
+        .yandex-form-section { padding: 3rem 1.2rem; background: linear-gradient(180deg, var(--cream), var(--white)); text-align: center; }
+        .form-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            padding: 1rem 2.2rem; font-family: 'Montserrat', sans-serif; font-size: 0.85rem;
+            letter-spacing: 0.12rem; text-transform: uppercase; color: var(--white);
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            border: none; border-radius: 30px; text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+            box-shadow: 0 4px 15px rgba(184, 134, 11, 0.25);
+            min-height: 48px; cursor: pointer;
+        }
+        .form-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(184, 134, 11, 0.35); filter: brightness(1.05); }
+        .form-btn:active { transform: scale(0.98); }
+        .form-note { font-size: 0.8rem; color: var(--text-light); margin-top: 1rem; line-height: 1.6; max-width: 320px; margin-left: auto; margin-right: auto; }
+
         /* ===== MAP ===== */
         .map-section { padding: 0; }
         .map-placeholder {
@@ -190,22 +181,6 @@
         .footer-date { font-size: 0.8rem; color: rgba(255,255,255,0.5); letter-spacing: 0.1rem; }
         .footer-hashtag { margin-top: 1rem; font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-style: italic; color: rgba(255,255,255,0.7); }
         .footer-hearts { margin-top: 1.5rem; font-size: 1rem; color: var(--gold-light); letter-spacing: 0.4rem; }
-
-        /* ===== MUSIC TOGGLE ===== */
-        .music-toggle {
-            position: fixed; bottom: var(--safe-bottom); right: 1.2rem;
-            width: 44px; height: 44px; border-radius: 50%; background: var(--white);
-            border: 1px solid var(--gold-light); cursor: pointer; display: flex; align-items: center;
-            justify-content: center; z-index: 999; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-        }
-        .music-bars { display: flex; gap: 2px; align-items: flex-end; height: 16px; }
-        .music-bar { width: 3px; background: var(--gold); border-radius: 2px; animation: musicBar 0.8s ease-in-out infinite alternate; }
-        .music-bar:nth-child(1) { height: 6px; animation-delay: 0s; }
-        .music-bar:nth-child(2) { height: 12px; animation-delay: 0.2s; }
-        .music-bar:nth-child(3) { height: 8px; animation-delay: 0.4s; }
-        .music-bar:nth-child(4) { height: 14px; animation-delay: 0.1s; }
-        .music-bars.paused .music-bar { animation: none; height: 3px !important; }
-        @keyframes musicBar { from { height: 4px; } to { height: 16px; } }
 
         /* ===== DESKTOP ===== */
         @media (min-width: 768px) {
@@ -324,30 +299,22 @@
         <p class="dresscode-note reveal">Подтвердите присутствие заранее.<br>Контакт: <strong>+7 (XXX) XXX-XX-XX</strong></p>
     </section>
 
-    
-    <!-- MUSIC FORM -->
-<section class="music-section" id="music">
-    <h2 class="section-title reveal">🎵  Музыкальные пожелания</h2>
-    <p class="section-subtitle reveal">помогите создать идеальный плейлист</p>
-    <form class="music-form reveal" id="musicForm" action="?music_form=1" method="post" novalidate>
-        <div class="form-group">
-            <label for="songRequest">Какие треки вы хотели бы услышать?</label>
-            <textarea
-                id="songRequest"
-                name="songRequest"
-                placeholder="Например: 'Perfect' — Ed Sheeran, русские хиты 90-х, лёгкий джаз..."
-                required
-            ></textarea>
-            <span class="form-hint">💡  Можно указать несколько треков через запятую</span>
+    <!-- YANDEX FORM BUTTON -->
+    <section class="yandex-form-section" id="rsvp">
+        <h2 class="section-title reveal">Музыкальные предпочтения</h2>
+        <p class="section-subtitle reveal">заполните, пожалуйста, форму</p>
+        <div class="reveal" style="margin-top: 1.5rem;">
+            <!-- 🔽 ВСТАВЬТЕ ВАШУ ССЫЛКУ НИЖЕ вместо # 🔽 -->
+            <a href="https://forms.yandex.ru/u/6a1b150490fa7bd0d883543c" 
+               target="_blank" rel="noopener noreferrer" 
+               class="form-btn">
+                📝 Заполнить форму
+            </a>
         </div>
-        <button type="submit" class="submit-btn" id="musicSubmitBtn">
-            ✨ Отправить пожелание
-        </button>
-        <p id="musicFormMessage" class="form-message" style="display: none;"></p>
-    </form>
-    <p class="dresscode-note reveal" style="margin-top: 1.2rem;">
-        Все пожелания будут переданы диджею! 🎶     </p>
-</section>
+        <p class="form-note reveal">
+            💌 Ссылка откроется в новой вкладке.<br>Данные автоматически сохранятся у организаторов.
+        </p>
+    </section>
 
     <!-- MAP -->
     <section class="map-section">
@@ -367,68 +334,7 @@
         <p class="footer-hearts">♥ ♥ ♥</p>
     </footer>
 
-    <!-- MUSIC TOGGLE -->
-    <button class="music-toggle" id="musicToggle" aria-label="Музыка">
-        <div class="music-bars paused" id="musicBars">
-            <div class="music-bar"></div><div class="music-bar"></div><div class="music-bar"></div><div class="music-bar"></div>
-        </div>
-    </button>
-
-
-
-
-    
     <script>
-
-document.addEventListener('DOMContentLoaded', function () {
-        const musicForm = document.getElementById('musicForm');
-        const songRequest = document.getElementById('songRequest');
-        const submitBtn = document.getElementById('musicSubmitBtn');
-        const message = document.getElementById('musicFormMessage');
-        if (!musicForm || !songRequest || !submitBtn || !message) {
-            return;
-        }
-        musicForm.addEventListener('submit', async function (event) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            const songValue = songRequest.value.trim();
-            if (!songValue) {
-                showMessage('Пожалуйста, напишите музыкальное пожелание.', false);
-                return;
-            }
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Отправляем...';
-            try {
-                const response = await fetch(`${window.location.pathname}?music_form=1`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        songRequest: songValue
-                    })
-                });
-                const result = await response.json();
-                if (!response.ok || !result.success) {
-                    throw new Error(result.message || 'Ошибка отправки.');
-                }
-                musicForm.reset();
-                showMessage('Спасибо! Ваше музыкальное пожелание отправлено 🎶 ', true);
-            } catch (error) {
-                showMessage('Ошибка отправки. Попробуйте ещё раз.', false);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '✨ Отправить пожелание';
-            }
-        });
-        function showMessage(text, isSuccess) {
-            message.textContent = text;
-            message.style.display = 'block';
-            message.style.marginTop = '1rem';
-            message.style.color = isSuccess ? '#2e7d32' : '#c62828';
-        }
-    });
-
         // COUNTDOWN
         const weddingDate = new Date('2026-07-24T11:30:00+03:00').getTime();
         function updateCountdown() {
@@ -453,15 +359,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // SCROLL REVEAL
         const observer = new IntersectionObserver((e) => e.forEach(el => { if(el.isIntersecting) el.target.classList.add('visible'); }), { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-        // MUSIC TOGGLE (визуальный)
-        const musicToggle = document.getElementById('musicToggle');
-        const musicBars = document.getElementById('musicBars');
-        let isPlaying = false;
-        musicToggle.addEventListener('click', () => {
-            isPlaying = !isPlaying;
-            musicBars.classList.toggle('paused', !isPlaying);
-        });
 
         // SMOOTH SCROLL
         document.querySelectorAll('a[href^="#"]').forEach(a => {
