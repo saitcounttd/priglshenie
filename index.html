@@ -165,6 +165,58 @@
         .chat-btn { display: block; width: 100%; margin-top: 0.8rem; padding: 0.8rem; background: linear-gradient(135deg, var(--vk-color), #4a90e2); color: white; border-radius: 10px; text-decoration: none; font-weight: 500; transition: transform 0.2s, filter 0.2s; font-size: 0.85rem; }
         .chat-btn:active { transform: scale(0.98); filter: brightness(0.95); }
 
+        /* ===== SURPRISE / ORGANIZER ===== */
+        .surprise-block { 
+            max-width: 400px; margin: 2rem auto 0; 
+            background: linear-gradient(135deg, var(--blush), var(--white)); 
+            padding: 1.5rem; border-radius: 16px; 
+            border: 1px solid rgba(184, 134, 11, 0.15); 
+            text-align: center; 
+        }
+        .surprise-title { 
+            font-family: 'Cormorant Garamond', serif; 
+            font-size: 1.3rem; color: var(--dark); 
+            margin: 0.5rem 0 0.8rem; 
+        }
+        .surprise-text { 
+            font-size: 0.85rem; color: var(--text-light); 
+            margin-bottom: 1rem; line-height: 1.5; 
+        }
+        .organizer-links { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 0.5rem; 
+            width: 100%;
+        }
+
+        .organizer-link { 
+            flex: 1 1 0; /* равное распределение ширины */
+            min-width: 0; /* предотвращает переполнение */
+            max-width: 140px; /* ограничиваем ширину на больших экранах */
+    
+            background: var(--white); 
+            color: var(--dark); 
+            border: 1px solid var(--gold-light); 
+            padding: 0.6rem 0.8rem; 
+            border-radius: 8px;
+            text-decoration: none; 
+            font-size: 0.75rem; 
+            transition: all 0.2s; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; /* центрируем контент */
+            gap: 4px;
+            white-space: nowrap; /* текст в одну строку */
+            text-align: center;
+        }
+
+        .organizer-link:active { 
+            background: var(--gold-light); 
+            color: var(--white); 
+            transform: scale(0.98); 
+        }
+
         /* ===== YANDEX FORM BUTTON ===== */
         .yandex-form-section { padding: 3rem 1.2rem; background: var(--white); text-align: center; border-top: 1px solid rgba(0,0,0,0.03); }
         .form-btn {
@@ -323,14 +375,14 @@
         <p class="section-subtitle reveal">1 билет = 1 человек</p>
     </section>
 
-    <!-- CONTACTS (VK & Phones & Chat) -->
+    <!-- CONTACTS (VK & Phones & Chat & Organizer) -->
     <section class="contacts-section" id="contacts">
         <h2 class="section-title reveal">Связь с нами</h2>
         <p class="section-subtitle reveal">мы всегда на связи</p>
+        
         <div class="contacts-grid reveal">
             <div class="contact-card">
                 <h3>Даниил</h3>
-                <!-- Замените номера и ссылки ниже -->
                 <a href="tel:+79315055350" class="contact-link phone">📞 Позвонить</a>
                 <a href="https://vk.ru/i__danya_t" target="_blank" class="contact-link vk">🔵 ВКонтакте</a>
             </div>
@@ -341,10 +393,22 @@
             </div>
         </div>
         
+        <!-- Guest Chat -->
         <div class="chat-container reveal">
             <p style="margin-bottom:0.5rem; font-size:0.9rem; color:var(--text);">💬 Чат гостей ВКонтакте</p>
-            <p style="font-size:0.75rem; color:var(--text-light);">Все новости, фото и обсуждения здесь</p>
+            <p style="font-size:0.75rem; color:var(--text-light); margin-bottom: 0.8rem;">Все новости, фото и обсуждения здесь</p>
             <a href="https://vk.me/join/B/msUepMlmdgpiEC3gAP/Mf1p_amIMdciQo=" target="_blank" class="chat-btn">Вступить в чат</a>
+        </div>
+
+        <!-- SURPRISE / ORGANIZER -->
+        <div class="surprise-block reveal">
+            <div style="font-size: 1.8rem; margin-bottom: 0.3rem;">✨</div>
+            <h3 class="surprise-title">Хотите сделать сюрприз?</h3>
+            <p class="surprise-text">Если у вас есть подарки-сюрпризы, свяжитесь с нашим организатором:</p>
+            <div class="organizer-links">
+                <a href="tel:+79115052939" class="organizer-link">📞 Позвонить</a>
+                <a href="https://vk.ru/d.pokatilo" target="_blank" class="organizer-link">🔵 VK</a>
+            </div>
         </div>
     </section>
 
@@ -353,7 +417,6 @@
         <h2 class="section-title reveal">Музыкальные предпочтения</h2>
         <p class="section-subtitle reveal">заполните, пожалуйста, форму</p>
         <div class="reveal" style="margin-top: 1.5rem;">
-            <!-- Вставьте вашу ссылку на форму вместо # -->
             <a href="https://forms.yandex.ru/u/6a1b150490fa7bd0d883543c" 
                target="_blank" rel="noopener noreferrer" 
                class="form-btn">
